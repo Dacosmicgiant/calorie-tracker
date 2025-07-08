@@ -5,11 +5,6 @@ set -o errexit  # exit on error
 
 echo "Starting build process for CalorieTracker..."
 
-# Install system dependencies for psycopg2
-echo "Installing system dependencies for PostgreSQL..."
-apt-get update
-apt-get install -y libpq-dev gcc python3-dev
-
 # Upgrade pip and install dependencies
 echo "Installing Python dependencies..."
 pip install --upgrade pip
