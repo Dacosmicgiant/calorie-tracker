@@ -110,7 +110,7 @@
                                         </h6>
                                     </div>
                                     <div class="col-md-6 text-md-end">
-                                        <span class="badge {% if data.total_calories >= daily_goal %}bg-success{% elif data.total_calories >= daily_goal|mul:0.8 %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                                        <span class="badge {% if data.total_calories >= daily_goal %}bg-success{% elif data.total_calories >= daily_goal_80_percent %}bg-warning{% else %}bg-danger{% endif %} fs-6">
                                             {{ data.total_calories }} / {{ daily_goal }} calories
                                         </span>
                                     </div>
@@ -122,7 +122,7 @@
                                     <div class="progress mb-3" style="height: 20px;">
                                         <div class="progress-bar 
                                             {% if data.total_calories >= daily_goal %}bg-success
-                                            {% elif data.total_calories >= daily_goal|mul:0.8 %}bg-warning
+                                            {% elif data.total_calories >= daily_goal_80_percent %}bg-warning
                                             {% else %}bg-danger
                                             {% endif %}" 
                                             style="width: {% widthratio data.total_calories daily_goal 100 %}%">

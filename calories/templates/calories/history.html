@@ -70,7 +70,7 @@
                                                     <div class="fw-medium">{{ entry.food.name }}</div>
                                                     {% if entry.date in daily_totals %}
                                                         <small class="text-muted">
-                                                            Daily total: {{ daily_totals|dict_lookup:entry.date }} cal
+                                                            {{ daily_totals.entry.date }}
                                                         </small>
                                                     {% endif %}
                                                 </div>
