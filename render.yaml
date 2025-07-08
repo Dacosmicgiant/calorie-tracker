@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: calorie-tracker
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn nutrition.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: DJANGO_SETTINGS_MODULE
+        value: nutrition.production_settings
+      - key: WEB_CONCURRENCY
+        value: 4
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
