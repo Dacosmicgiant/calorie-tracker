@@ -9,9 +9,13 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from datetime import date, timedelta
 import json
+import logging
 
 from .models import Food, CalorieEntry, UserProfile
 from .forms import CalorieEntryForm, UserProfileForm
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 def home(request):
     """Home page - redirects to dashboard if logged in"""
@@ -24,12 +28,17 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Create user profile with default calorie goal
-            UserProfile.objects.create(user=user, daily_calorie_goal=2000)
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
-            return redirect('login')
+            try:
+                user = form.save()
+                # UserProfile will be created automatically by signal handler
+                # No need to create it manually here
+                username = form.cleaned_data.get('username')
+                messages.success(request, f'Account created for {username}!')
+                return redirect('login')
+            except Exception as e:
+                # Log the error and show a user-friendly message
+                logger.error(f'Error creating user account: {e}')
+                messages.error(request, 'An error occurred while creating your account. Please try again.')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -109,11 +118,15 @@ def add_calorie_entry(request):
     if request.method == 'POST':
         form = CalorieEntryForm(request.POST)
         if form.is_valid():
-            entry = form.save(commit=False)
-            entry.user = request.user
-            entry.save()
-            messages.success(request, f'Added {entry.food.name} to your daily intake!')
-            return redirect('dashboard')
+            try:
+                entry = form.save(commit=False)
+                entry.user = request.user
+                entry.save()
+                messages.success(request, f'Added {entry.food.name} to your daily intake!')
+                return redirect('dashboard')
+            except Exception as e:
+                logger.error(f'Error adding calorie entry for user {request.user.username}: {e}')
+                messages.error(request, 'An error occurred while adding your entry. Please try again.')
     else:
         form = CalorieEntryForm()
     
@@ -175,9 +188,13 @@ def edit_entry(request, entry_id):
     if request.method == 'POST':
         form = CalorieEntryForm(request.POST, instance=entry)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Entry updated successfully!')
-            return redirect('calorie_history')
+            try:
+                form.save()
+                messages.success(request, 'Entry updated successfully!')
+                return redirect('calorie_history')
+            except Exception as e:
+                logger.error(f'Error updating entry {entry_id} for user {request.user.username}: {e}')
+                messages.error(request, 'An error occurred while updating your entry. Please try again.')
     else:
         form = CalorieEntryForm(instance=entry)
     
@@ -189,9 +206,14 @@ def delete_entry(request, entry_id):
     entry = get_object_or_404(CalorieEntry, id=entry_id, user=request.user)
     
     if request.method == 'POST':
-        entry.delete()
-        messages.success(request, 'Entry deleted successfully!')
-        return redirect('calorie_history')
+        try:
+            food_name = entry.food.name
+            entry.delete()
+            messages.success(request, f'Entry for {food_name} deleted successfully!')
+            return redirect('calorie_history')
+        except Exception as e:
+            logger.error(f'Error deleting entry {entry_id} for user {request.user.username}: {e}')
+            messages.error(request, 'An error occurred while deleting your entry. Please try again.')
     
     return render(request, 'calories/delete_entry.html', {'entry': entry})
 
@@ -206,9 +228,13 @@ def profile_settings(request):
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('dashboard')
+            try:
+                form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('dashboard')
+            except Exception as e:
+                logger.error(f'Error updating profile for user {request.user.username}: {e}')
+                messages.error(request, 'An error occurred while updating your profile. Please try again.')
     else:
         form = UserProfileForm(instance=profile)
     

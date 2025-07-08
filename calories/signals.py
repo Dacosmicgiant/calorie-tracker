@@ -1,22 +1,24 @@
+# calories/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import UserProfile
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_or_update_user_profile(sender, instance, created, **kwargs):
     """
-    Create a UserProfile whenever a new User is created
+    Create a UserProfile when a new User is created, or ensure it exists
     """
     if created:
-        UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    """
-    Save the UserProfile whenever the User is saved
-    """
-    if hasattr(instance, 'userprofile'):
-        instance.userprofile.save()
+        # User was just created, create profile
+        UserProfile.objects.get_or_create(
+            user=instance,
+            defaults={'daily_calorie_goal': 2000}
+        )
     else:
-        UserProfile.objects.create(user=instance)
+        # User was updated, ensure profile exists
+        if not hasattr(instance, 'userprofile'):
+            UserProfile.objects.get_or_create(
+                user=instance,
+                defaults={'daily_calorie_goal': 2000}
+            )

@@ -1,3 +1,4 @@
+# calories/apps.py
 from django.apps import AppConfig
 
 
@@ -6,4 +7,8 @@ class CaloriesConfig(AppConfig):
     name = "calories"
     
     def ready(self):
-        import calories.signals
+        """Import signals when the app is ready"""
+        try:
+            import calories.signals
+        except ImportError:
+            pass
