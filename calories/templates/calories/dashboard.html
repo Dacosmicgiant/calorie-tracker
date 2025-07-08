@@ -1,0 +1,348 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Dashboard - CalorieTracker{% endblock %}
+
+{% block content %}
+<!-- Welcome Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2">
+                            <i class="fas fa-sun me-2"></i>Good day, {{ user.first_name|default:user.username }}!
+                        </h2>
+                        <p class="mb-0 lead">Let's track your nutrition for {% if today_entries %}{{ today_entries.0.date|date:"F d, Y" }}{% else %}today{% endif %}</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{% url 'add_entry' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-plus me-2"></i>Add Food
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6 fw-bold text-primary">{{ today_calories }}</div>
+                <div class="text-muted">Calories Today</div>
+                <div class="mt-2">
+                    <small class="text-muted">Goal: {{ calorie_goal }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6 fw-bold {% if remaining_calories >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ remaining_calories }}
+                </div>
+                <div class="text-muted">{% if remaining_calories >= 0 %}Remaining{% else %}Over Goal{% endif %}</div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        {% if remaining_calories >= 0 %}
+                            <i class="fas fa-thumbs-up text-success"></i> Stay on track!
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle text-warning"></i> Above goal
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6 fw-bold text-info">{{ today_entries|length }}</div>
+                <div class="text-muted">Food Items</div>
+                <div class="mt-2">
+                    <small class="text-muted">Added today</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-6 fw-bold text-warning">{{ progress_percentage|floatformat:0 }}%</div>
+                <div class="text-muted">Progress</div>
+                <div class="mt-2">
+                    <small class="text-muted">Of daily goal</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Daily Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ today_calories }} / {{ calorie_goal }} calories</span>
+                    <span>{{ progress_percentage|floatformat:1 }}%</span>
+                </div>
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar 
+                        {% if progress_percentage <= 50 %}bg-danger
+                        {% elif progress_percentage <= 80 %}bg-warning
+                        {% elif progress_percentage <= 100 %}bg-success
+                        {% else %}bg-info
+                        {% endif %}" 
+                        role="progressbar" 
+                        id="daily-progress-bar"
+                        data-progress="{{ progress_percentage|floatformat:1 }}">
+                        <span class="fw-bold">
+                            {% if progress_percentage > 100 %}
+                                Over Goal!
+                            {% else %}
+                                {{ progress_percentage|floatformat:1 }}%
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% if progress_percentage > 100 %}
+                    {% with excess_calories=today_calories|add:"-"|add:calorie_goal %}
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            You've exceeded your daily goal by {{ excess_calories }} calories
+                        </small>
+                    {% endwith %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Two Column Layout -->
+<div class="row">
+    <!-- Today's Food Entries -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-utensils me-2"></i>Today's Food</h5>
+                <a href="{% url 'add_entry' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add
+                </a>
+            </div>
+            <div class="card-body">
+                {% if today_entries %}
+                    {% for entry in today_entries %}
+                        <div class="food-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ entry.food.name }}</h6>
+                                    <small class="text-muted">
+                                        {{ entry.quantity }} × {{ entry.food.serving }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-primary">{{ entry.total_calories }} cal</div>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'edit_entry' entry.id %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_entry' entry.id %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No food logged today</h5>
+                        <p class="text-muted">Start tracking your nutrition by adding your first meal!</p>
+                        <a href="{% url 'add_entry' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add First Food
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            {% if today_entries %}
+                <div class="card-footer text-center">
+                    <a href="{% url 'calorie_history' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-history me-2"></i>View All History
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Weekly Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Weekly Overview</h5>
+                <a href="{% url 'weekly_report' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-1"></i>Details
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'add_entry' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-plus fa-2x d-block mb-2"></i>
+                            Add Food
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'calorie_history' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-history fa-2x d-block mb-2"></i>
+                            View History
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'weekly_report' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar fa-2x d-block mb-2"></i>
+                            Weekly Report
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'profile_settings' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-cog fa-2x d-block mb-2"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up progress bar width using JavaScript to avoid CSS validation issues
+    const progressBar = document.getElementById('daily-progress-bar');
+    if (progressBar) {
+        const progress = parseFloat(progressBar.dataset.progress) || 0;
+        const width = progress > 100 ? 100 : progress;
+        progressBar.style.width = width + '%';
+    }
+
+    // Weekly Chart - Check if Chart.js is loaded and chart container exists
+    const chartCanvas = document.getElementById('weeklyChart');
+    if (chartCanvas && typeof Chart !== 'undefined') {
+        try {
+            const ctx = chartCanvas.getContext('2d');
+            
+            // Parse week data safely
+            let weekData = [];
+            let goalLine = 2000; // Default goal
+            
+            {% if week_data %}
+                try {
+                    weekData = {{ week_data|safe }};
+                } catch (e) {
+                    console.error('Error parsing week data:', e);
+                    weekData = [];
+                }
+            {% endif %}
+            
+            {% if calorie_goal %}
+                goalLine = {{ calorie_goal }};
+            {% endif %}
+            
+            // Only create chart if we have data
+            if (weekData.length > 0) {
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: weekData.map(function(d) { return d.date || ''; }),
+                        datasets: [{
+                            label: 'Daily Calories',
+                            data: weekData.map(function(d) { return d.calories || 0; }),
+                            borderColor: 'rgb(76, 175, 80)',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Goal',
+                            data: weekData.map(function() { return goalLine; }),
+                            borderColor: 'rgb(255, 193, 7)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Calories'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Show message if no data
+                const chartContainer = chartCanvas.parentElement;
+                chartContainer.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-chart-line fa-2x mb-2"></i><br>No data available for chart</div>';
+            }
+        } catch (error) {
+            console.error('Error creating chart:', error);
+            const chartContainer = chartCanvas.parentElement;
+            chartContainer.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>Chart could not be loaded</div>';
+        }
+    }
+
+    // Auto-refresh every 5 minutes (optional - you can remove this if not needed)
+    setTimeout(function() {
+        if (document.visibilityState === 'visible') {
+            location.reload();
+        }
+    }, 300000); // 5 minutes
+});
+</script>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Edit Entry - CalorieTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-edit me-2"></i>Edit Food Entry</h3>
+                <p class="mb-0 text-muted">Update your food entry details</p>
+            </div>
+            <div class="card-body">
+                <!-- Current Entry Info -->
+                <div class="alert alert-info">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="alert-heading mb-1">
+                                <i class="fas fa-info-circle me-2"></i>Current Entry
+                            </h6>
+                            <strong>{{ entry.food.name }}</strong> - {{ entry.quantity }} × {{ entry.food.serving }}
+                            <br><small class="text-muted">Added on {{ entry.date|date:"F d, Y" }} at {{ entry.time_added|date:"g:i A" }}</small>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="display-6 fw-bold text-primary">{{ entry.total_calories }}</div>
+                            <small class="text-muted">calories</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <form method="post" id="edit-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.food.id_for_label }}" class="form-label">
+                                <i class="fas fa-utensils me-2"></i>Food Item
+                            </label>
+                            {{ form.food }}
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                You can change to a different food item
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                <i class="fas fa-balance-scale me-2"></i>Quantity
+                            </label>
+                            {{ form.quantity }}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Date
+                            </label>
+                            {{ form.date }}
+                        </div>
+                    </div>
+                    
+                    <!-- Updated Calorie Preview -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light mb-3" id="calorie-preview">
+                                <div class="card-body text-center">
+                                    <h4 class="text-primary mb-0">
+                                        <i class="fas fa-fire me-2"></i>
+                                        <span id="total-calories">{{ entry.total_calories }}</span> calories
+                                    </h4>
+                                    <small class="text-muted">Updated total for this entry</small>
+                                    <div class="mt-2" id="calorie-change"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'calorie_history' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to History
+                        </a>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{% url 'delete_entry' entry.id %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Entry History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Entry Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Food:</strong> {{ entry.food.name }}</li>
+                            <li><strong>Serving Size:</strong> {{ entry.food.serving }}</li>
+                            <li><strong>Calories per Serving:</strong> {{ entry.food.calories_per_serving }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Date Added:</strong> {{ entry.date|date:"F d, Y" }}</li>
+                            <li><strong>Time Added:</strong> {{ entry.time_added|date:"g:i A" }}</li>
+                            <li><strong>Entry ID:</strong> #{{ entry.id }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const foodSelect = document.getElementById('id_food');
+    const quantityInput = document.getElementById('id_quantity');
+    const totalCaloriesSpan = document.getElementById('total-calories');
+    const calorieChange = document.getElementById('calorie-change');
+    const originalCalories = {{ entry.total_calories }};
+    
+    // Store food calories data
+    const foodCalories = {};
+    Array.from(foodSelect.options).forEach(option => {
+        if (option.value) {
+            // Extract calories from option text (assuming format like "Food Name - XXX cal")
+            const match = option.textContent.match(/(\d+)\s*cal/);
+            if (match) {
+                foodCalories[option.value] = parseInt(match[1]);
+            }
+        }
+    });
+
+    function updateCaloriePreview() {
+        const selectedFoodId = foodSelect.value;
+        const quantity = parseFloat(quantityInput.value) || 1;
+        
+        if (selectedFoodId && foodCalories[selectedFoodId]) {
+            const caloriesPerServing = foodCalories[selectedFoodId];
+            const totalCalories = Math.round(caloriesPerServing * quantity);
+            const difference = totalCalories - originalCalories;
+            
+            totalCaloriesSpan.textContent = totalCalories;
+            
+            // Show calorie change
+            if (difference !== 0) {
+                const changeClass = difference > 0 ? 'text-warning' : 'text-success';
+                const changeIcon = difference > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                const changeText = difference > 0 ? `+${difference}` : `${difference}`;
+                
+                calorieChange.innerHTML = `
+                    <small class="${changeClass}">
+                        <i class="fas ${changeIcon} me-1"></i>
+                        ${changeText} calories from original
+                    </small>
+                `;
+            } else {
+                calorieChange.innerHTML = `
+                    <small class="text-muted">
+                        <i class="fas fa-equals me-1"></i>
+                        No change from original
+                    </small>
+                `;
+            }
+        }
+    }
+
+    // Update preview when form values change
+    foodSelect.addEventListener('change', updateCaloriePreview);
+    quantityInput.addEventListener('input', updateCaloriePreview);
+
+    // Form validation
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        // Show loading state
+        submitBtn.innerHTML = '<span class="loading"></span> Saving...';
+        submitBtn.disabled = true;
+    });
+
+    // Add Bootstrap classes to form elements
+    const formControls = document.querySelectorAll('select, input[type="number"], input[type="date"]');
+    formControls.forEach(control => {
+        control.classList.add('form-control');
+    });
+
+    // Initialize preview
+    updateCaloriePreview();
+});
+</script>
+{% endblock %}

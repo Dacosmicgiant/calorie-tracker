@@ -1,0 +1,54 @@
+from django import template
+
+register = template.Library()
+
+@register.filter
+def dict_lookup(dictionary, key):
+    """Look up a key in a dictionary - useful for template lookups"""
+    return dictionary.get(key, '')
+
+@register.filter
+def mul(value, multiply_by):
+    """Multiply a value by another value"""
+    try:
+        return float(value) * float(multiply_by)
+    except (ValueError, TypeError):
+        return 0
+
+@register.filter
+def percentage(value, total):
+    """Calculate percentage of value relative to total"""
+    try:
+        if float(total) == 0:
+            return 0
+        return (float(value) / float(total)) * 100
+    except (ValueError, TypeError):
+        return 0
+
+@register.filter
+def calories_color(calories, goal):
+    """Return a CSS class based on calorie intake vs goal"""
+    try:
+        percentage = (float(calories) / float(goal)) * 100
+        if percentage >= 100:
+            return 'text-success'
+        elif percentage >= 80:
+            return 'text-warning'
+        else:
+            return 'text-danger'
+    except (ValueError, TypeError):
+        return 'text-muted'
+
+@register.simple_tag
+def calorie_status(calories, goal):
+    """Return status text based on calorie intake"""
+    try:
+        percentage = (float(calories) / float(goal)) * 100
+        if percentage >= 100:
+            return "Goal Met!"
+        elif percentage >= 80:
+            return "Almost There"
+        else:
+            return "Keep Going"
+    except (ValueError, TypeError):
+        return "No Data"

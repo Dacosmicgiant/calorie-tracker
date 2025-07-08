@@ -1,0 +1,329 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Add Food Entry - CalorieTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-plus me-2"></i>Add Food Entry</h3>
+                <p class="mb-0 text-muted">Track what you eat today</p>
+            </div>
+            <div class="card-body">
+                <!-- Food Search -->
+                <div class="mb-4">
+                    <label for="food-search" class="form-label">
+                        <i class="fas fa-search me-2"></i>Search for Food
+                    </label>
+                    <div class="position-relative">
+                        <input type="text" 
+                               class="form-control" 
+                               id="food-search" 
+                               placeholder="Type to search for food items..." 
+                               autocomplete="off">
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form method="post" id="calorie-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.food.id_for_label }}" class="form-label">
+                                <i class="fas fa-utensils me-2"></i>Selected Food
+                            </label>
+                            {{ form.food }}
+                            <div id="food-info" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                <i class="fas fa-balance-scale me-2"></i>Quantity
+                            </label>
+                            {{ form.quantity }}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Date
+                            </label>
+                            {{ form.date }}
+                        </div>
+                    </div>
+                    
+                    <!-- Calorie Preview -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light mb-3" id="calorie-preview" style="display: none;">
+                                <div class="card-body text-center">
+                                    <h4 class="text-primary mb-0">
+                                        <i class="fas fa-fire me-2"></i>
+                                        <span id="total-calories">0</span> calories
+                                    </h4>
+                                    <small class="text-muted">Total for this entry</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+                            <i class="fas fa-plus me-2"></i>Add Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Recent Foods -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recently Added Foods</h5>
+            </div>
+            <div class="card-body" id="recent-foods">
+                <p class="text-muted">Your recently added foods will appear here...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-result-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.search-result-details {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+.search-result-calories {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+#food-info {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.recent-food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.recent-food-item:hover {
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('food-search');
+    const searchResults = document.getElementById('search-results');
+    const foodSelect = document.getElementById('id_food');
+    const quantityInput = document.getElementById('id_quantity');
+    const foodInfo = document.getElementById('food-info');
+    const caloriePreview = document.getElementById('calorie-preview');
+    const totalCaloriesSpan = document.getElementById('total-calories');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    let searchTimeout;
+    let selectedFood = null;
+
+    // Food search functionality
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            fetch(`/api/search-food/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displaySearchResults(data.results);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                });
+        }, 300);
+    });
+
+    function displaySearchResults(results) {
+        searchResults.innerHTML = '';
+        
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div class="search-result-item">No foods found</div>';
+        } else {
+            results.forEach(food => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.innerHTML = `
+                    <div class="search-result-name">${food.name}</div>
+                    <div class="search-result-details">
+                        ${food.serving} - <span class="search-result-calories">${food.calories} cal</span>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    selectFood(food);
+                });
+                
+                searchResults.appendChild(item);
+            });
+        }
+        
+        searchResults.style.display = 'block';
+    }
+
+    function selectFood(food) {
+        selectedFood = food;
+        searchInput.value = food.name;
+        searchResults.style.display = 'none';
+        
+        // Update the select dropdown
+        foodSelect.value = food.id;
+        
+        // Show food info
+        foodInfo.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${food.name}</strong><br>
+                    <small class="text-muted">${food.serving}</small>
+                </div>
+                <div class="text-end">
+                    <div class="h5 text-primary mb-0">${food.calories} cal</div>
+                    <small class="text-muted">per serving</small>
+                </div>
+            </div>
+        `;
+        
+        updateCaloriePreview();
+        checkFormValid();
+    }
+
+    function updateCaloriePreview() {
+        if (selectedFood && quantityInput.value) {
+            const quantity = parseFloat(quantityInput.value) || 1;
+            const totalCalories = Math.round(selectedFood.calories * quantity);
+            
+            totalCaloriesSpan.textContent = totalCalories;
+            caloriePreview.style.display = 'block';
+        } else {
+            caloriePreview.style.display = 'none';
+        }
+    }
+
+    function checkFormValid() {
+        const isValid = selectedFood && quantityInput.value && document.getElementById('id_date').value;
+        submitBtn.disabled = !isValid;
+    }
+
+    // Update calorie preview when quantity changes
+    quantityInput.addEventListener('input', function() {
+        updateCaloriePreview();
+        checkFormValid();
+    });
+
+    // Update validation when date changes
+    document.getElementById('id_date').addEventListener('change', checkFormValid);
+
+    // Hide search results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    // Load recent foods
+    loadRecentFoods();
+
+    function loadRecentFoods() {
+        // This would typically fetch from an API endpoint
+        // For now, we'll show a placeholder
+        const recentFoodsContainer = document.getElementById('recent-foods');
+        recentFoodsContainer.innerHTML = `
+            <p class="text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                Recent foods will be shown here after you add some entries.
+            </p>
+        `;
+    }
+
+    // Form submission
+    document.getElementById('calorie-form').addEventListener('submit', function(e) {
+        if (!selectedFood) {
+            e.preventDefault();
+            alert('Please select a food item');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<span class="loading"></span> Adding...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

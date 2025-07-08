@@ -1,0 +1,394 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Calorie History - CalorieTracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-history me-2"></i>Calorie History</h3>
+                <a href="{% url 'add_entry' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Entry
+                </a>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <!-- Filter/Search Bar -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="history-search" 
+                                       placeholder="Search food entries...">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'weekly_report' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-chart-bar me-2"></i>Weekly Report
+                                </a>
+                                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Food Item</th>
+                                    <th>Serving</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end">Calories</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                {% for entry in page_obj %}
+                                    <tr class="history-row" data-food-name="{{ entry.food.name|lower }}">
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold">{{ entry.date|date:"M d, Y" }}</span>
+                                                <small class="text-muted">{{ entry.time_added|date:"g:i A" }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="food-icon me-2">
+                                                    <i class="fas fa-utensils text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-medium">{{ entry.food.name }}</div>
+                                                    {% if entry.date in daily_totals %}
+                                                        <small class="text-muted">
+                                                            Daily total: {{ daily_totals|dict_lookup:entry.date }} cal
+                                                        </small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">{{ entry.food.serving }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ entry.quantity }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="calorie-display">
+                                                <span class="fw-bold text-primary fs-5">{{ entry.total_calories }}</span>
+                                                <small class="text-muted d-block">calories</small>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'edit_entry' entry.id %}" 
+                                                   class="btn btn-outline-primary"
+                                                   data-bs-toggle="tooltip"
+                                                   title="Edit Entry">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'delete_entry' entry.id %}" 
+                                                   class="btn btn-outline-danger"
+                                                   data-bs-toggle="tooltip"
+                                                   title="Delete Entry">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+
+                    <!-- Page Info -->
+                    <div class="text-center text-muted mt-3">
+                        <small>
+                            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} entries
+                        </small>
+                    </div>
+
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted">No entries found</h4>
+                        <p class="text-muted mb-4">You haven't logged any food entries yet.</p>
+                        <a href="{% url 'add_entry' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>Add Your First Entry
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Card -->
+{% if page_obj %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-primary">{{ page_obj.paginator.count }}</div>
+                            <div class="stat-label">Total Entries</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-success" id="total-calories-stat">---</div>
+                            <div class="stat-label">Total Calories</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-info" id="avg-calories-stat">---</div>
+                            <div class="stat-label">Avg per Day</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-warning" id="unique-foods-stat">---</div>
+                            <div class="stat-label">Unique Foods</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.history-row {
+    transition: all 0.2s ease;
+}
+
+.history-row:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+    transform: scale(1.01);
+}
+
+.food-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(76, 175, 80, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calorie-display {
+    text-align: right;
+}
+
+.stat-item {
+    padding: 1rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.badge {
+    font-size: 0.8rem;
+}
+
+.page-link {
+    color: var(--primary-color);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.4rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('history-search');
+    const tableBody = document.getElementById('history-table-body');
+    const rows = tableBody ? tableBody.querySelectorAll('.history-row') : [];
+
+    if (searchInput && rows.length > 0) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            rows.forEach(row => {
+                const foodName = row.dataset.foodName;
+                const dateText = row.querySelector('td:first-child').textContent.toLowerCase();
+                
+                if (foodName.includes(searchTerm) || dateText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Update "no results" message
+            const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+            if (visibleRows.length === 0 && searchTerm !== '') {
+                showNoResultsMessage();
+            } else {
+                hideNoResultsMessage();
+            }
+        });
+    }
+
+    function showNoResultsMessage() {
+        let noResultsRow = document.getElementById('no-results-row');
+        if (!noResultsRow) {
+            noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'no-results-row';
+            noResultsRow.innerHTML = `
+                <td colspan="6" class="text-center py-4">
+                    <i class="fas fa-search fa-2x text-muted mb-2"></i>
+                    <div class="text-muted">No entries match your search</div>
+                </td>
+            `;
+            tableBody.appendChild(noResultsRow);
+        }
+        noResultsRow.style.display = '';
+    }
+
+    function hideNoResultsMessage() {
+        const noResultsRow = document.getElementById('no-results-row');
+        if (noResultsRow) {
+            noResultsRow.style.display = 'none';
+        }
+    }
+
+    // Calculate and display stats
+    calculateStats();
+
+    function calculateStats() {
+        if (!rows.length) return;
+
+        let totalCalories = 0;
+        const uniqueFoods = new Set();
+        const dailyTotals = {};
+
+        rows.forEach(row => {
+            const caloriesText = row.querySelector('.calorie-display .fw-bold').textContent;
+            const calories = parseInt(caloriesText);
+            const foodName = row.dataset.foodName;
+            const dateText = row.querySelector('td:first-child .fw-bold').textContent;
+
+            totalCalories += calories;
+            uniqueFoods.add(foodName);
+
+            if (!dailyTotals[dateText]) {
+                dailyTotals[dateText] = 0;
+            }
+            dailyTotals[dateText] += calories;
+        });
+
+        const avgCalories = Math.round(totalCalories / Object.keys(dailyTotals).length);
+
+        // Update stat displays
+        const totalCaloriesStat = document.getElementById('total-calories-stat');
+        const avgCaloriesStat = document.getElementById('avg-calories-stat');
+        const uniqueFoodsStat = document.getElementById('unique-foods-stat');
+
+        if (totalCaloriesStat) totalCaloriesStat.textContent = totalCalories.toLocaleString();
+        if (avgCaloriesStat) avgCaloriesStat.textContent = avgCalories.toLocaleString();
+        if (uniqueFoodsStat) uniqueFoodsStat.textContent = uniqueFoods.size;
+    }
+
+    // Add smooth scrolling for pagination
+    const paginationLinks = document.querySelectorAll('.pagination .page-link');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Add loading state
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-spinner fa-spin';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

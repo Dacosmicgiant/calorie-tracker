@@ -1,0 +1,171 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Welcome to CalorieTracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="hero-section">
+            <h1 class="display-4 fw-bold mb-4">
+                <i class="fas fa-utensils text-success me-3"></i>
+                Track Your Nutrition Journey
+            </h1>
+            <p class="lead mb-4">
+                Take control of your health with our comprehensive calorie tracking application. 
+                Monitor your daily intake, set goals, and achieve a healthier lifestyle.
+            </p>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-md-2">
+                    <i class="fas fa-rocket me-2"></i>Get Started
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="feature-cards">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon me-3">
+                            <i class="fas fa-database fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Comprehensive Food Database</h5>
+                            <p class="card-text text-muted">Access thousands of food items with accurate calorie information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon me-3">
+                            <i class="fas fa-chart-line fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Progress Tracking</h5>
+                            <p class="card-text text-muted">Visualize your daily, weekly, and monthly progress with charts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon me-3">
+                            <i class="fas fa-target fa-2x text-warning"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Goal Setting</h5>
+                            <p class="card-text text-muted">Set personalized calorie goals and track your achievement.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon me-3">
+                            <i class="fas fa-mobile-alt fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Mobile Friendly</h5>
+                            <p class="card-text text-muted">Access your tracker on any device, anywhere, anytime.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Why Choose CalorieTracker?</h2>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="stats-number">500+</div>
+            <div class="stats-label">Food Items</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stats-number">100%</div>
+            <div class="stats-label">Free to Use</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="stats-number">24/7</div>
+            <div class="stats-label">Available</div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-5">How It Works</h2>
+    </div>
+    
+    <div class="col-md-3 text-center mb-4">
+        <div class="step-icon mb-3">
+            <i class="fas fa-user-plus fa-3x text-primary"></i>
+        </div>
+        <h4>1. Sign Up</h4>
+        <p class="text-muted">Create your free account and set your daily calorie goals.</p>
+    </div>
+    
+    <div class="col-md-3 text-center mb-4">
+        <div class="step-icon mb-3">
+            <i class="fas fa-plus fa-3x text-success"></i>
+        </div>
+        <h4>2. Log Food</h4>
+        <p class="text-muted">Add the foods you eat throughout the day from our extensive database.</p>
+    </div>
+    
+    <div class="col-md-3 text-center mb-4">
+        <div class="step-icon mb-3">
+            <i class="fas fa-chart-bar fa-3x text-warning"></i>
+        </div>
+        <h4>3. Track Progress</h4>
+        <p class="text-muted">Monitor your daily intake and see your progress over time.</p>
+    </div>
+    
+    <div class="col-md-3 text-center mb-4">
+        <div class="step-icon mb-3">
+            <i class="fas fa-trophy fa-3x text-danger"></i>
+        </div>
+        <h4>4. Achieve Goals</h4>
+        <p class="text-muted">Reach your health and fitness goals with consistent tracking.</p>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card text-center" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+            <div class="card-body py-5">
+                <h2 class="card-title">Ready to Start Your Journey?</h2>
+                <p class="card-text lead">Join thousands of users who are already achieving their health goals.</p>
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg mt-3">
+                    <i class="fas fa-rocket me-2"></i>Start Tracking Today
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

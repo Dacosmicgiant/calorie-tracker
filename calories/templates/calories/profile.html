@@ -1,0 +1,403 @@
+{% extends 'calories/base.html' %}
+
+{% block title %}Profile Settings - CalorieTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-cog me-2"></i>Profile Settings</h3>
+                <p class="mb-0 text-muted">Manage your account and preferences</p>
+            </div>
+            <div class="card-body">
+                <!-- User Info Section -->
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        <div class="profile-avatar mb-3">
+                            <i class="fas fa-user-circle fa-5x text-primary"></i>
+                        </div>
+                        <h5>{{ user.first_name|default:user.username }}</h5>
+                        <p class="text-muted">{{ user.email|default:"No email set" }}</p>
+                        <small class="text-muted">
+                            Member since {{ user.date_joined|date:"F Y" }}
+                        </small>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-number text-primary" id="total-entries">---</div>
+                                    <div class="stat-label">Total Entries</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-number text-success" id="days-tracked">---</div>
+                                    <div class="stat-label">Days Tracked</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-number text-info" id="avg-daily">---</div>
+                                    <div class="stat-label">Avg Daily Calories</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-number text-warning" id="streak">---</div>
+                                    <div class="stat-label">Current Streak</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Settings Form -->
+                <form method="post" id="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.daily_calorie_goal.id_for_label }}" class="form-label">
+                                <i class="fas fa-bullseye me-2"></i>Daily Calorie Goal
+                            </label>
+                            {{ form.daily_calorie_goal }}
+                            <div class="form-text">{{ form.daily_calorie_goal.help_text }}</div>
+                            {% if form.daily_calorie_goal.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.daily_calorie_goal.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-chart-line me-2"></i>Goal Progress
+                            </label>
+                            <div class="goal-preview" id="goal-preview">
+                                <div class="current-goal">
+                                    Current: <span class="fw-bold text-primary">{{ form.daily_calorie_goal.value|default:2000 }}</span> calories/day
+                                </div>
+                                <div class="goal-recommendation mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        Typical ranges: 1,500-2,000 (women), 2,000-2,500 (men)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Additional Settings -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Additional Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-download me-2 text-success"></i>Export Data</h6>
+                        <p class="text-muted small">Download your calorie tracking data</p>
+                        <button class="btn btn-outline-success btn-sm" onclick="exportData()">
+                            <i class="fas fa-download me-2"></i>Export CSV
+                        </button>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-chart-pie me-2 text-info"></i>Quick Stats</h6>
+                        <p class="text-muted small">View your tracking statistics</p>
+                        <a href="{% url 'weekly_report' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-chart-bar me-2"></i>View Reports
+                        </a>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-trash-alt me-2 text-danger"></i>Danger Zone</h6>
+                        <p class="text-muted small">Permanently delete all your data</p>
+                        <button class="btn btn-outline-danger btn-sm" onclick="showDeleteWarning()">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Delete All Data
+                        </button>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-question-circle me-2 text-secondary"></i>Need Help?</h6>
+                        <p class="text-muted small">Get help with using CalorieTracker</p>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="showHelp()">
+                            <i class="fas fa-life-ring me-2"></i>Help & Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Username:</strong> {{ user.username }}</li>
+                            <li><strong>Email:</strong> {{ user.email|default:"Not set" }}</li>
+                            <li><strong>First Name:</strong> {{ user.first_name|default:"Not set" }}</li>
+                            <li><strong>Last Name:</strong> {{ user.last_name|default:"Not set" }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</li>
+                            <li><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</li>
+                            <li><strong>Account Status:</strong> 
+                                <span class="badge bg-success">Active</span>
+                            </li>
+                            <li><strong>Profile ID:</strong> #{{ user.id }}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="/admin/" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <i class="fas fa-external-link-alt me-2"></i>Edit Account Details
+                    </a>
+                    <small class="text-muted ms-3">
+                        Use the admin interface to update your personal information
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Delete Warning Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Data Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Warning:</strong> This will permanently delete all your calorie tracking data including:</p>
+                <ul>
+                    <li>All food entries</li>
+                    <li>Historical data</li>
+                    <li>Progress records</li>
+                    <li>Your profile settings</li>
+                </ul>
+                <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="deleteAllData()">
+                    <i class="fas fa-trash me-2"></i>Yes, Delete Everything
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle me-2"></i>Help & Support
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Getting Started</h6>
+                        <ul class="small">
+                            <li>Set your daily calorie goal</li>
+                            <li>Add foods from our database</li>
+                            <li>Track your daily progress</li>
+                            <li>Review weekly reports</li>
+                        </ul>
+                        
+                        <h6>Tips for Success</h6>
+                        <ul class="small">
+                            <li>Log foods immediately after eating</li>
+                            <li>Be accurate with portion sizes</li>
+                            <li>Review your progress regularly</li>
+                            <li>Adjust goals as needed</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Features</h6>
+                        <ul class="small">
+                            <li>Search through 500+ food items</li>
+                            <li>Real-time calorie calculations</li>
+                            <li>Progress charts and reports</li>
+                            <li>Edit and delete entries</li>
+                        </ul>
+                        
+                        <h6>Troubleshooting</h6>
+                        <ul class="small">
+                            <li>Clear browser cache if pages load slowly</li>
+                            <li>Use Chrome or Firefox for best experience</li>
+                            <li>Contact admin for technical issues</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-avatar {
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: block;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.goal-preview {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.current-goal {
+    font-size: 1.1rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+@media (max-width: 768px) {
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const goalInput = document.getElementById('id_daily_calorie_goal');
+    const goalPreview = document.getElementById('goal-preview');
+    
+    // Update goal preview when input changes
+    if (goalInput) {
+        goalInput.addEventListener('input', function() {
+            const currentGoalSpan = goalPreview.querySelector('.current-goal .fw-bold');
+            if (currentGoalSpan) {
+                currentGoalSpan.textContent = this.value || '2000';
+            }
+        });
+    }
+
+    // Add Bootstrap classes to form fields
+    const formControls = document.querySelectorAll('input[type="number"]');
+    formControls.forEach(control => {
+        control.classList.add('form-control');
+    });
+
+    // Load user statistics
+    loadUserStats();
+    
+    // Form submission
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<span class="loading"></span> Saving...';
+        submitBtn.disabled = true;
+    });
+});
+
+function loadUserStats() {
+    // Simulate loading user statistics
+    // In a real app, this would fetch from an API
+    setTimeout(() => {
+        document.getElementById('total-entries').textContent = '---';
+        document.getElementById('days-tracked').textContent = '---';
+        document.getElementById('avg-daily').textContent = '---';
+        document.getElementById('streak').textContent = '---';
+    }, 1000);
+}
+
+function exportData() {
+    // Simulate data export
+    const link = document.createElement('a');
+    link.href = 'data:text/csv;charset=utf-8,Date,Food,Quantity,Calories\n';
+    link.download = 'calorie_data.csv';
+    link.click();
+    
+    alert('Data export feature coming soon!');
+}
+
+function showDeleteWarning() {
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+}
+
+function deleteAllData() {
+    // This would typically send a request to delete all user data
+    alert('Data deletion feature would be implemented with proper confirmation.');
+    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+    deleteModal.hide();
+}
+
+function showHelp() {
+    const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+    helpModal.show();
+}
+</script>
+{% endblock %}
