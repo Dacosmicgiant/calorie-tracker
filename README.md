@@ -1,440 +1,645 @@
-# CalorieTracker - Full Stack Web Application
+# 🍎 CalorieTracker - Full Stack Web Application
 
-A comprehensive calorie tracking web application built with Django, HTML/CSS/JavaScript, and SQLite. This project serves as a capstone project for BSc IT students, demonstrating full-stack development skills.
+[![Django](https://img.shields.io/badge/Django-5.2.4-green.svg)](https://djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.0-purple.svg)](https://getbootstrap.com/)
+[![License](https://img.shields.io/badge/License-Educational-yellow.svg)](#license)
 
-![CalorieTracker Dashboard](https://via.placeholder.com/800x400/4CAF50/white?text=CalorieTracker+Dashboard)
+A comprehensive calorie tracking web application built with Django, HTML/CSS/JavaScript, and SQLite. This project serves as a capstone project for BSc IT students, demonstrating full-stack development skills including modern web technologies, responsive design, and deployment practices.
+
+![CalorieTracker Dashboard](https://via.placeholder.com/1200x600/4CAF50/white?text=CalorieTracker+Dashboard+Demo)
 
 ## 🌟 Features
 
-### Core Functionality
+### 🔐 User Management
 
-- **User Authentication**: Secure registration, login, and logout
-- **Calorie Tracking**: Add, edit, and delete daily food entries
-- **Food Database**: 500+ food items with accurate nutritional data
-- **Progress Monitoring**: Real-time progress bars and goal tracking
-- **Data Visualization**: Interactive charts using Chart.js
-- **Weekly Reports**: Comprehensive analytics and insights
+- **Secure Registration & Authentication**: Complete user account system with session management
+- **Profile Customization**: Personal settings including daily calorie goals
+- **Dashboard Personalization**: Customized welcome messages and user-specific data
 
-### User Experience
+### 📊 Calorie Tracking
+
+- **Comprehensive Food Database**: 500+ food items with accurate nutritional information
+- **Real-time Search**: AJAX-powered food search with instant results
+- **Smart Entry System**: Easy food logging with quantity and date selection
+- **CRUD Operations**: Full Create, Read, Update, Delete functionality for entries
+
+### 📈 Analytics & Visualization
+
+- **Interactive Dashboard**: Daily progress tracking with visual indicators
+- **Progress Bars**: Real-time goal achievement visualization
+- **Weekly Reports**: Comprehensive analytics with Chart.js integration
+- **Historical Data**: Complete entry history with pagination
+
+### 🎨 Modern UI/UX
 
 - **Responsive Design**: Mobile-first approach with Bootstrap 5
-- **AJAX Search**: Real-time food search functionality
-- **Modern UI**: Gradient backgrounds, smooth animations
-- **Dark/Light Theme Elements**: Professional color scheme
-- **Intuitive Navigation**: Easy-to-use interface
-
-### Technical Features
-
-- **CRUD Operations**: Full Create, Read, Update, Delete functionality
-- **Pagination**: Efficient handling of large datasets
-- **Form Validation**: Client and server-side validation
-- **Session Management**: Secure user sessions
-- **Static File Handling**: Optimized CSS/JS delivery
+- **Gradient Themes**: Professional color schemes and modern aesthetics
+- **Smooth Animations**: CSS transitions and hover effects
+- **Intuitive Navigation**: User-friendly interface with Font Awesome icons
 
 ## 🛠️ Technology Stack
 
-### Backend
+### Backend Technologies
 
-- **Framework**: Django 5.2.4
-- **Database**: SQLite3 (development), PostgreSQL (production ready)
-- **Authentication**: Django's built-in auth system
+- **Framework**: Django 5.2.4 (Python web framework)
+- **Database**: SQLite3 (development), PostgreSQL (production)
+- **Authentication**: Django's built-in authentication system
 - **API**: RESTful endpoints for AJAX functionality
+- **ORM**: Django's Object-Relational Mapping
 
-### Frontend
+### Frontend Technologies
 
-- **Templates**: Django Template Engine
+- **Template Engine**: Django Template Language
 - **CSS Framework**: Bootstrap 5.3.0
+- **JavaScript**: Vanilla ES6+ with modern features
+- **Charts**: Chart.js 3.9.1 for data visualization
 - **Icons**: Font Awesome 6.4.0
-- **Charts**: Chart.js 3.9.1
-- **JavaScript**: Vanilla JS with modern ES6+ features
+- **Styling**: Custom CSS with CSS Variables and Flexbox/Grid
 
-### Development Tools
+### Development & Deployment
 
-- **Version Control**: Git
-- **Package Management**: pip, requirements.txt
-- **Static Files**: Django's staticfiles system
-- **Testing**: Django's testing framework
+- **Version Control**: Git with comprehensive .gitignore
+- **Package Management**: pip with requirements.txt
+- **Testing**: Django's built-in testing framework
+- **Static Files**: Django's collectstatic system
+- **Production Ready**: Configured for multiple hosting platforms
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
-nutrition/                     # Main project directory
-├── nutrition/                 # Django project settings
-│   ├── __init__.py
-│   ├── settings.py           # Main settings file
-│   ├── production_settings.py # Production settings
-│   ├── urls.py               # Main URL configuration
-│   ├── wsgi.py               # WSGI configuration
-│   └── asgi.py               # ASGI configuration
-├── calories/                  # Main Django app
-│   ├── migrations/           # Database migrations
-│   ├── static/               # Static files
-│   │   └── calories/
-│   │       └── css/
-│   │           └── style.css # Custom CSS
-│   ├── templates/            # HTML templates
-│   │   ├── calories/         # App templates
-│   │   └── registration/     # Auth templates
-│   ├── templatetags/         # Custom template filters
-│   ├── management/           # Management commands
-│   │   └── commands/
-│   ├── __init__.py
-│   ├── admin.py              # Admin configuration
-│   ├── apps.py               # App configuration
-│   ├── forms.py              # Django forms
-│   ├── models.py             # Database models
-│   ├── signals.py            # Django signals
-│   ├── tests.py              # Test suite
-│   ├── urls.py               # App URL patterns
-│   ├── utils.py              # Utility functions
-│   └── views.py              # View functions
-├── dataset.csv               # Food nutrition data
-├── requirements.txt          # Python dependencies
-├── manage.py                 # Django management script
-├── deploy.py                 # Deployment script
-├── db.sqlite3                # SQLite database
-└── README.md                 # This file
+CalorieTracker/
+├── 📁 nutrition/                    # Django project root
+│   ├── 📄 __init__.py
+│   ├── 📄 settings.py              # Development settings
+│   ├── 📄 production_settings.py   # Production configuration
+│   ├── 📄 urls.py                  # Main URL routing
+│   ├── 📄 wsgi.py                  # WSGI configuration
+│   └── 📄 asgi.py                  # ASGI configuration
+├── 📁 calories/                     # Main Django application
+│   ├── 📁 migrations/              # Database migrations
+│   ├── 📁 static/calories/css/     # Custom stylesheets
+│   ├── 📁 templates/               # HTML templates
+│   │   ├── 📁 calories/            # App-specific templates
+│   │   └── 📁 registration/        # Authentication templates
+│   ├── 📁 management/commands/     # Custom Django commands
+│   ├── 📄 models.py                # Database models
+│   ├── 📄 views.py                 # View functions
+│   ├── 📄 forms.py                 # Django forms
+│   ├── 📄 urls.py                  # App URL patterns
+│   ├── 📄 admin.py                 # Admin configuration
+│   ├── 📄 signals.py               # Django signals
+│   ├── 📄 utils.py                 # Utility functions
+│   ├── 📄 tests.py                 # Comprehensive test suite
+│   └── 📄 apps.py                  # App configuration
+├── 📄 dataset.csv                  # Nutritional database (500+ foods)
+├── 📄 requirements.txt             # Python dependencies
+├── 📄 manage.py                    # Django management script
+├── 📄 deploy.py                    # Deployment automation script
+├── 📄 build.sh                     # Build script for production
+├── 📄 render.yaml                  # Render.com deployment config
+├── 📄 .python-version              # Python version specification
+├── 📄 .gitignore                   # Git ignore patterns
+└── 📄 README.md                    # This documentation
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 
-- Python 3.8+ installed
-- Git installed
+- Python 3.8+ installed on your system
+- Git for version control
 - Virtual environment (recommended)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
-### Installation
+### Installation Steps
 
-1. **Clone the repository**
+1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url>
-   cd nutrition
+   git clone https://github.com/yourusername/CalorieTracker.git
+   cd CalorieTracker
    ```
 
-2. **Create virtual environment**
+2. **Set Up Virtual Environment**
 
    ```bash
+   # Create virtual environment
    python -m venv venv
 
-   # Windows
+   # Activate virtual environment
+   # Windows:
    venv\Scripts\activate
 
-   # macOS/Linux
+   # macOS/Linux:
    source venv/bin/activate
    ```
 
-3. **Install dependencies**
+3. **Install Dependencies**
 
    ```bash
+   pip install --upgrade pip
    pip install -r requirements.txt
    ```
 
-4. **Run setup script**
+4. **Automated Setup (Recommended)**
 
    ```bash
    python deploy.py development
    ```
 
-5. **Start the server**
+   OR **Manual Setup**:
+
+   ```bash
+   # Database setup
+   python manage.py makemigrations
+   python manage.py migrate
+
+   # Load food data
+   python manage.py load_food_data
+
+   # Create test user and data
+   python manage.py setup_test_data --create-user --create-entries
+
+   # Create superuser (optional)
+   python manage.py createsuperuser
+   ```
+
+5. **Start Development Server**
 
    ```bash
    python manage.py runserver
    ```
 
-6. **Access the application**
-   - Open http://127.0.0.1:8000/ in your browser
-   - Login with: `testuser` / `testpass123`
-   - Or create admin: `python manage.py createsuperuser`
-
-## 📖 Detailed Setup
-
-### Manual Setup (if deploy.py doesn't work)
-
-1. **Database Setup**
-
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-2. **Load Food Data**
-
-   ```bash
-   python manage.py load_food_data
-   ```
-
-3. **Create Superuser**
-
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-4. **Create Test Data**
-
-   ```bash
-   python manage.py setup_test_data --create-user --create-entries
-   ```
-
-5. **Collect Static Files** (for production)
-   ```bash
-   python manage.py collectstatic
-   ```
+6. **Access the Application**
+   - Open your browser and go to: `http://127.0.0.1:8000/`
+   - **Test Login**: Username: `testuser`, Password: `testpass123`
+   - **Admin Panel**: `http://127.0.0.1:8000/admin/` (if superuser created)
 
 ## 🧪 Testing
 
 ### Run Test Suite
 
 ```bash
+# Run all tests
 python manage.py test
-```
 
-### Test Individual Components
-
-```bash
-# Test models only
+# Run specific test categories
 python manage.py test calories.tests.ModelTests
-
-# Test views only
 python manage.py test calories.tests.ViewTests
-
-# Test forms only
 python manage.py test calories.tests.FormTests
+python manage.py test calories.tests.IntegrationTests
+
+# Run with coverage (if installed)
+pip install coverage
+coverage run --source='.' manage.py test
+coverage report
+coverage html
 ```
 
 ### Manual Testing Checklist
 
-- ✅ User registration and authentication
-- ✅ Food search and selection
-- ✅ Adding/editing/deleting entries
+- ✅ User registration and login functionality
+- ✅ Food search and entry creation
 - ✅ Dashboard data visualization
-- ✅ Weekly reports generation
-- ✅ Responsive design on mobile
-- ✅ Form validation
-- ✅ Error handling
+- ✅ CRUD operations on calorie entries
+- ✅ Weekly report generation
+- ✅ Profile settings management
+- ✅ Responsive design on different devices
+- ✅ Form validation and error handling
 
-## 📱 Usage Guide
+## 📱 User Guide
 
 ### Getting Started
 
-1. **Register** a new account or login
-2. **Set your daily calorie goal** in profile settings
-3. **Search and add foods** you consume
-4. **Track your progress** on the dashboard
-5. **Review weekly reports** for insights
+1. **Register**: Create a new account with username and password
+2. **Set Goals**: Configure your daily calorie target in profile settings
+3. **Search Foods**: Use the search feature to find foods from our database
+4. **Log Entries**: Add foods with quantities and dates
+5. **Track Progress**: Monitor your daily and weekly progress
+6. **View Reports**: Analyze your nutrition patterns
 
-### Key Features
+### Key Features Walkthrough
 
 #### Dashboard
 
-- View today's calorie intake
-- See progress towards daily goal
+- View today's calorie intake and remaining calories
+- See progress bar towards daily goal
 - Quick access to add new entries
-- Weekly progress chart
+- Weekly trend chart
 
-#### Food Tracking
+#### Food Entry System
 
-- Search from 500+ food items
-- Real-time calorie calculations
-- Edit or delete existing entries
-- View complete history
+- Real-time search through 500+ food items
+- Detailed nutritional information
+- Flexible quantity input (decimals supported)
+- Date selection for backdated entries
 
-#### Reports & Analytics
+#### History & Analytics
 
-- Weekly calorie breakdowns
-- Daily progress charts
-- Goal achievement tracking
-- Performance insights
+- Paginated view of all entries
+- Edit and delete capabilities
+- Weekly reports with insights
+- Visual progress tracking
 
-## 🌐 Deployment
+## 🌐 Deployment Guide
 
-### Development
+### Development Environment
 
-Already configured for local development with SQLite and debug mode enabled.
+Already configured for local development with SQLite and debug mode.
 
 ### Production Deployment
 
-#### Option 1: PythonAnywhere
+#### Option 1: Render.com (Recommended)
 
-1. Upload project files
-2. Create virtual environment
-3. Install requirements
-4. Configure WSGI file
-5. Set up static files
+1. **Push to GitHub**:
 
-#### Option 2: Render.com
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
 
-1. Connect GitHub repository
-2. Use provided `render.yaml`
-3. Set environment variables
-4. Deploy automatically
+2. **Deploy on Render**:
 
-#### Option 3: Heroku
+   - Connect your GitHub repository
+   - Set environment variables:
+     ```
+     DJANGO_SETTINGS_MODULE=nutrition.production_settings
+     SECRET_KEY=your-secret-key-here
+     ```
+   - Render will automatically use `build.sh` and deploy
 
-1. Use provided `Procfile`
-2. Set environment variables
-3. Configure PostgreSQL addon
-4. Deploy via Git
+3. **Access Your App**: `https://your-app-name.onrender.com`
 
-### Environment Variables (Production)
+#### Option 2: Heroku
+
+1. **Install Heroku CLI**
+2. **Deploy**:
+   ```bash
+   heroku create your-app-name
+   heroku config:set DJANGO_SETTINGS_MODULE=nutrition.production_settings
+   heroku config:set SECRET_KEY=your-secret-key
+   git push heroku main
+   heroku run python manage.py migrate
+   heroku run python manage.py load_food_data
+   ```
+
+#### Option 3: PythonAnywhere
+
+1. Upload project files to PythonAnywhere
+2. Create virtual environment and install requirements
+3. Configure WSGI file
+4. Set up static files
+5. Run migrations and load data
+
+### Environment Variables
+
+For production deployment, set these environment variables:
 
 ```bash
+SECRET_KEY=your-super-secret-key-here
 DJANGO_SETTINGS_MODULE=nutrition.production_settings
-SECRET_KEY=your-secret-key
 DATABASE_URL=your-database-url
-ALLOWED_HOSTS=your-domain.com
+ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+DEBUG=False
 ```
 
-## 🔧 Configuration
+## 🔧 Configuration & Customization
 
-### Settings Files
+### Settings Configuration
 
-- `settings.py` - Development settings
-- `production_settings.py` - Production settings (created by deploy script)
+- **Development**: `nutrition/settings.py`
+- **Production**: `nutrition/production_settings.py`
 
-### Key Settings
+### Database Configuration
 
-- **DEBUG**: False in production
-- **ALLOWED_HOSTS**: Configure for your domain
-- **DATABASES**: SQLite for dev, PostgreSQL for production
-- **STATIC_FILES**: Configured for both environments
+```python
+# Development (SQLite)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-### Customization
+# Production (PostgreSQL)
+DATABASES = {
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+}
+```
 
-- **Colors**: Edit CSS variables in `style.css`
-- **Logo/Branding**: Update templates and static files
-- **Features**: Extend models and views as needed
+### UI Customization
+
+- **Colors**: Edit CSS variables in `calories/static/calories/css/style.css`
+- **Logo**: Replace logo references in templates
+- **Styling**: Modify Bootstrap classes and custom CSS
+
+### Adding New Features
+
+1. **Models**: Add to `calories/models.py`
+2. **Views**: Add to `calories/views.py`
+3. **URLs**: Add to `calories/urls.py`
+4. **Templates**: Create in `calories/templates/calories/`
+5. **Tests**: Add to `calories/tests.py`
 
 ## 📊 Database Schema
 
-### Models Overview
+### Core Models
 
-#### User (Django built-in)
+#### User (Django Built-in)
 
-- username, email, password
-- first_name, last_name
-- date_joined, last_login
+- `id` (Primary Key)
+- `username` (Unique)
+- `email`
+- `password` (Hashed)
+- `first_name`, `last_name`
+- `date_joined`, `last_login`
 
 #### UserProfile
 
-- user (OneToOne with User)
-- daily_calorie_goal (Integer)
-- created_at (DateTime)
+```python
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    daily_calorie_goal = models.IntegerField(default=2000)
+    created_at = models.DateTimeField(auto_now_add=True)
+```
 
 #### Food
 
-- name (CharField)
-- serving (CharField)
-- calories_per_serving (Integer)
+```python
+class Food(models.Model):
+    name = models.CharField(max_length=100)
+    serving = models.CharField(max_length=100)
+    calories_per_serving = models.IntegerField()
+```
 
 #### CalorieEntry
 
-- user (ForeignKey to User)
-- food (ForeignKey to Food)
-- quantity (DecimalField)
-- date (DateField)
-- time_added (DateTimeField)
+```python
+class CalorieEntry(models.Model):
+    user = models.ForeignKey(User)
+    food = models.ForeignKey(Food)
+    quantity = models.DecimalField(max_digits=5, decimal_places=2)
+    date = models.DateField()
+    time_added = models.DateTimeField(auto_now_add=True)
+```
+
+## 🔌 API Endpoints
+
+### Authentication Required Endpoints
+
+| Method   | Endpoint            | Description           |
+| -------- | ------------------- | --------------------- |
+| GET      | `/dashboard/`       | Main dashboard view   |
+| GET/POST | `/add/`             | Add new calorie entry |
+| GET      | `/history/`         | View entry history    |
+| GET/POST | `/edit/<id>/`       | Edit specific entry   |
+| POST     | `/delete/<id>/`     | Delete specific entry |
+| GET/POST | `/profile/`         | User profile settings |
+| GET      | `/weekly-report/`   | Weekly analytics      |
+| GET      | `/api/search-food/` | AJAX food search      |
+
+### Public Endpoints
+
+| Method   | Endpoint     | Description       |
+| -------- | ------------ | ----------------- |
+| GET      | `/`          | Home page         |
+| GET/POST | `/login/`    | User login        |
+| GET/POST | `/register/` | User registration |
+| POST     | `/logout/`   | User logout       |
+
+## 🐛 Troubleshooting
+
+### Common Issues & Solutions
+
+#### "ModuleNotFoundError: No module named 'calories'"
+
+```bash
+# Ensure virtual environment is activated
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+```
+
+#### Database Migration Errors
+
+```bash
+# Reset migrations (development only)
+python manage.py migrate --fake calories zero
+python manage.py makemigrations calories
+python manage.py migrate
+```
+
+#### Static Files Not Loading
+
+```bash
+# Collect static files
+python manage.py collectstatic --noinput
+
+# Check settings
+DEBUG = True  # for development
+STATIC_URL = '/static/'
+```
+
+#### Food Data Missing
+
+```bash
+# Reload food data
+python manage.py load_food_data
+```
+
+#### Permission Errors (Linux/macOS)
+
+```bash
+# Fix file permissions
+chmod +x manage.py
+chmod +x deploy.py
+chmod +x build.sh
+```
+
+### Debug Mode
+
+For development, enable detailed error messages:
+
+```python
+# In settings.py
+DEBUG = True
+```
+
+### Logging
+
+View application logs:
+
+```bash
+# Check Django logs
+tail -f debug.log
+
+# For production
+tail -f /var/log/calorietracker/error.log
+```
+
+## 📚 Learning Objectives
+
+This project demonstrates proficiency in:
+
+### Backend Development
+
+- Django framework architecture
+- Model-View-Template (MVT) pattern
+- Database design and ORM usage
+- User authentication and authorization
+- RESTful API development
+- Form handling and validation
+
+### Frontend Development
+
+- Responsive web design principles
+- Bootstrap framework usage
+- JavaScript DOM manipulation
+- AJAX for dynamic content
+- CSS3 modern features
+- Accessibility considerations
+
+### Full-Stack Integration
+
+- Template rendering with dynamic data
+- Static file management
+- Session handling
+- CSRF protection
+- Database migrations
+- Environment configuration
+
+### Software Engineering Practices
+
+- Version control with Git
+- Test-driven development
+- Code organization and modularity
+- Documentation writing
+- Deployment automation
+- Error handling and logging
 
 ## 🤝 Contributing
 
 ### Development Workflow
 
-1. Fork the repository
-2. Create feature branch
-3. Make changes
-4. Add tests
-5. Update documentation
-6. Submit pull request
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature-name`
+3. **Make** your changes
+4. **Add** tests for new functionality
+5. **Run** the test suite: `python manage.py test`
+6. **Commit** your changes: `git commit -m "Add feature"`
+7. **Push** to your fork: `git push origin feature-name`
+8. **Submit** a pull request
 
 ### Code Standards
 
-- Follow PEP 8 for Python code
-- Use meaningful variable names
-- Add docstrings to functions
-- Include tests for new features
-- Update README for significant changes
+- Follow **PEP 8** for Python code style
+- Use **meaningful variable names** and function names
+- Add **docstrings** to all functions and classes
+- Include **tests** for new features
+- Update **documentation** for significant changes
+- Use **type hints** where appropriate
 
-## 📝 API Endpoints
+### Commit Message Format
 
-### Public Endpoints
-
-- `/` - Home page
-- `/login/` - User login
-- `/register/` - User registration
-
-### Authenticated Endpoints
-
-- `/dashboard/` - Main dashboard
-- `/add/` - Add calorie entry
-- `/history/` - Entry history
-- `/weekly-report/` - Weekly analytics
-- `/profile/` - User settings
-
-### AJAX Endpoints
-
-- `/api/search-food/` - Food search API
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### "No module named 'calories'"
-
-- Ensure virtual environment is activated
-- Run `pip install -r requirements.txt`
-
-#### "Table doesn't exist" errors
-
-- Run `python manage.py migrate`
-- Check database file permissions
-
-#### Static files not loading
-
-- Run `python manage.py collectstatic`
-- Check STATIC_URL and STATIC_ROOT settings
-
-#### Food data missing
-
-- Run `python manage.py load_food_data`
-- Ensure `dataset.csv` exists in project root
-
-### Debug Mode
-
-Enable debug mode for detailed error messages:
-
-```python
-DEBUG = True  # in settings.py
+```
+feat: add user profile picture upload
+fix: resolve dashboard loading issue
+docs: update installation instructions
+test: add integration tests for food search
+style: improve dashboard responsive layout
 ```
 
-## 📄 License
+## 📄 License & Academic Use
 
-This project is developed for educational purposes as a capstone project for BSc IT students. Feel free to use and modify for learning purposes.
+This project is developed as a **capstone project for BSc IT students** and is intended for **educational purposes**.
 
-## 👥 Authors
+### Academic Guidelines
 
-- **Student Name** - Initial development
-- **Course**: BSc IT Final Year
-- **Institution**: [Your Institution]
-- **Year**: 2025
+- Feel free to use this project as a **learning reference**
+- **Cite this project** if using substantial portions for academic work
+- **Modify and extend** the functionality for your own projects
+- **Share improvements** with the community
+
+### Commercial Use
+
+- Review institutional policies before commercial use
+- Consider licensing requirements for production applications
+- Ensure compliance with data protection regulations
 
 ## 🙏 Acknowledgments
 
-- Django documentation and community
-- Bootstrap and Font Awesome teams
-- Chart.js developers
-- Food nutrition data sources
-- Course instructors and peers
+### Technologies & Frameworks
 
-## 📧 Support
+- **Django Software Foundation** - For the excellent Django framework
+- **Bootstrap Team** - For the responsive CSS framework
+- **Chart.js Contributors** - For the charting library
+- **Font Awesome** - For the comprehensive icon library
 
-For support and questions:
+### Educational Support
 
-- Check the troubleshooting section
-- Review Django documentation
-- Contact course instructors
-- Create issues for bugs
+- **Course Instructors** - For guidance and feedback
+- **Peer Students** - For collaboration and code reviews
+- **Stack Overflow Community** - For troubleshooting assistance
+- **Django Documentation** - For comprehensive learning resources
+
+### Data Sources
+
+- **USDA Food Database** - For nutritional information
+- **Open Food Facts** - For additional food data
+- **Various Nutrition APIs** - For data validation
+
+## 👥 Project Team
+
+**Lead Developer**: [Your Name]  
+**Course**: BSc IT Final Year  
+**Institution**: [Your Institution]  
+**Academic Year**: 2024-2025  
+**Project Duration**: [Start Date] - [End Date]
+
+### Supervisor
+
+**Name**: [Supervisor Name]  
+**Title**: [Title]  
+**Email**: [Email]
+
+## 📞 Support & Contact
+
+### For Technical Issues
+
+- 📧 **Email**: [your-email@institution.edu]
+- 🐛 **Bug Reports**: Create an issue on GitHub
+- 💡 **Feature Requests**: Open a discussion thread
+
+### For Academic Inquiries
+
+- 📚 **Course Related**: Contact your course instructor
+- 🎓 **Project Evaluation**: Refer to course guidelines
+- 📝 **Documentation**: Check course materials
+
+### Community Support
+
+- 💬 **Django Community**: [djangoproject.com/community](https://djangoproject.com/community)
+- 📖 **Documentation**: [docs.djangoproject.com](https://docs.djangoproject.com)
+- 🎥 **Tutorials**: Django official tutorials and YouTube channels
 
 ---
 
-**Happy Calorie Tracking! 🍎📊**
+## 🎯 Project Milestones
+
+- [x] **Phase 1**: Project setup and basic Django configuration
+- [x] **Phase 2**: User authentication and profile management
+- [x] **Phase 3**: Food database integration and search functionality
+- [x] **Phase 4**: Calorie tracking and CRUD operations
+- [x] **Phase 5**: Dashboard and data visualization
+- [x] **Phase 6**: Weekly reports and analytics
+- [x] **Phase 7**: UI/UX enhancements and responsive design
+- [x] **Phase 8**: Testing and quality assurance
+- [x] **Phase 9**: Deployment configuration and documentation
+- [x] **Phase 10**: Final testing and project submission
+
+---
+
+**🍎 Happy Calorie Tracking! 📊**
+
+_Built with ❤️ for BSc IT Final Year Project | Django • Bootstrap • Chart.js_
